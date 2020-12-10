@@ -75,7 +75,7 @@ class ArtifactsLibrariesTests {
 	@BeforeEach
 	void setup() {
 		this.artifacts = Collections.singleton(this.artifact);
-		this.libs = new ArtifactsLibraries(this.artifacts, Collections.emptyList(), null, mock(Log.class));
+		this.libs = new ArtifactsLibraries(this.artifacts, Collections.emptyList(), null, mock(Log.class), true);
 		given(this.artifactHandler.getExtension()).willReturn("jar");
 	}
 
@@ -103,7 +103,7 @@ class ArtifactsLibrariesTests {
 		unpack.setGroupId("gid");
 		unpack.setArtifactId("aid");
 		this.libs = new ArtifactsLibraries(this.artifacts, Collections.emptyList(), Collections.singleton(unpack),
-				mock(Log.class));
+				mock(Log.class), true);
 		this.libs.doWithLibraries(this.callback);
 		verify(this.callback).library(this.libraryCaptor.capture());
 		assertThat(this.libraryCaptor.getValue().isUnpackRequired()).isTrue();
@@ -126,7 +126,7 @@ class ArtifactsLibrariesTests {
 		given(artifact2.getFile()).willReturn(new File("a"));
 		given(artifact2.getArtifactHandler()).willReturn(this.artifactHandler);
 		this.artifacts = new LinkedHashSet<>(Arrays.asList(artifact1, artifact2));
-		this.libs = new ArtifactsLibraries(this.artifacts, Collections.emptyList(), null, mock(Log.class));
+		this.libs = new ArtifactsLibraries(this.artifacts, Collections.emptyList(), null, mock(Log.class), true);
 		this.libs.doWithLibraries(this.callback);
 		verify(this.callback, times(2)).library(this.libraryCaptor.capture());
 		assertThat(this.libraryCaptor.getAllValues().get(0).getName()).isEqualTo("g1-artifact-1.0.jar");
@@ -142,7 +142,7 @@ class ArtifactsLibrariesTests {
 		given(snapshotArtifact.getFile()).willReturn(new File("a"));
 		given(snapshotArtifact.getArtifactHandler()).willReturn(this.artifactHandler);
 		this.artifacts = Collections.singleton(snapshotArtifact);
-		new ArtifactsLibraries(this.artifacts, Collections.emptyList(), null, mock(Log.class))
+		new ArtifactsLibraries(this.artifacts, Collections.emptyList(), null, mock(Log.class), true)
 				.doWithLibraries((library) -> {
 					assertThat(library.isLocal()).isFalse();
 					assertThat(library.getCoordinates().getVersion()).isEqualTo("1.0-SNAPSHOT");
@@ -160,7 +160,7 @@ class ArtifactsLibrariesTests {
 		MavenProject mavenProject = mock(MavenProject.class);
 		given(mavenProject.getArtifact()).willReturn(artifact);
 		this.artifacts = Collections.singleton(artifact);
-		new ArtifactsLibraries(this.artifacts, Collections.singleton(mavenProject), null, mock(Log.class))
+		new ArtifactsLibraries(this.artifacts, Collections.singleton(mavenProject), null, mock(Log.class), true)
 				.doWithLibraries((library) -> assertThat(library.isLocal()).isTrue());
 	}
 
@@ -177,7 +177,7 @@ class ArtifactsLibrariesTests {
 		given(attachedArtifact.getArtifactHandler()).willReturn(this.artifactHandler);
 		given(mavenProject.getAttachedArtifacts()).willReturn(Collections.singletonList(attachedArtifact));
 		this.artifacts = Collections.singleton(attachedArtifact);
-		new ArtifactsLibraries(this.artifacts, Collections.singleton(mavenProject), null, mock(Log.class))
+		new ArtifactsLibraries(this.artifacts, Collections.singleton(mavenProject), null, mock(Log.class), true)
 				.doWithLibraries((library) -> assertThat(library.isLocal()).isTrue());
 	}
 

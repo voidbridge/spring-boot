@@ -65,6 +65,8 @@ public class ArtifactsLibraries implements Libraries {
 
 	private final Log log;
 
+	private final boolean includeVersion;
+
 	/**
 	 * Creates a new {@code ArtifactsLibraries} from the given {@code artifacts}.
 	 * @param artifacts the artifacts to represent as libraries
@@ -86,13 +88,31 @@ public class ArtifactsLibraries implements Libraries {
 	 * @param unpacks artifacts that should be unpacked on launch
 	 * @param log the log
 	 * @since 2.4.0
+	 * @deprecated since 2.4.1 in favour of {@link #ArtifactsLibraries(Set, Collection, Collection, Log, boolean)}
 	 */
+	@Deprecated
 	public ArtifactsLibraries(Set<Artifact> artifacts, Collection<MavenProject> localProjects,
 			Collection<Dependency> unpacks, Log log) {
+		this(artifacts, localProjects, unpacks, log, true);
+	}
+
+	/**
+	 * Creates a new {@code ArtifactsLibraries} from the given {@code artifacts}.
+	 * @param artifacts the artifacts to represent as libraries
+	 * @param localProjects projects for which {@link Library#isLocal() local} libraries
+	 * should be created
+	 * @param unpacks artifacts that should be unpacked on launch
+	 * @param log the log
+	 * @param includeVersion should version be included in filenames?
+	 * @since 2.4.1
+	 */
+	public ArtifactsLibraries(Set<Artifact> artifacts, Collection<MavenProject> localProjects,
+			Collection<Dependency> unpacks, Log log, boolean includeVersion) {
 		this.artifacts = artifacts;
 		this.localProjects = localProjects;
 		this.unpacks = unpacks;
 		this.log = log;
+		this.includeVersion = includeVersion;
 	}
 
 	@Override
@@ -154,7 +174,10 @@ public class ArtifactsLibraries implements Libraries {
 
 	private String getFileName(Artifact artifact) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(artifact.getArtifactId()).append("-").append(artifact.getBaseVersion());
+		sb.append(artifact.getArtifactId());
+		if (this.includeVersion) {
+			sb.append("-").append(artifact.getBaseVersion());
+		}
 		String classifier = artifact.getClassifier();
 		if (classifier != null) {
 			sb.append("-").append(classifier);

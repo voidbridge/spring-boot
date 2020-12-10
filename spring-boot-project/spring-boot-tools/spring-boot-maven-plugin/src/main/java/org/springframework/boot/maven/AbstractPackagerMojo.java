@@ -122,6 +122,13 @@ public abstract class AbstractPackagerMojo extends AbstractDependencyFilterMojo 
 	public boolean includeSystemScope;
 
 	/**
+	 * Include version in library filenames.
+	 * @since 2.4.1
+	 */
+	@Parameter(property = "spring-boot.repackage.includeVersionInLibFilename", defaultValue = "true")
+	private boolean includeVersionInLibFilename = true;
+
+	/**
 	 * Layer configuration with options to disable layer creation, exclude layer tools
 	 * jar, and provide a custom layers configuration file.
 	 * @since 2.3.0
@@ -181,7 +188,8 @@ public abstract class AbstractPackagerMojo extends AbstractDependencyFilterMojo 
 	 */
 	protected final Libraries getLibraries(Collection<Dependency> unpacks) throws MojoExecutionException {
 		Set<Artifact> artifacts = filterDependencies(this.project.getArtifacts(), getFilters(getAdditionalFilters()));
-		return new ArtifactsLibraries(artifacts, this.session.getProjects(), unpacks, getLog());
+		return new ArtifactsLibraries(artifacts, this.session.getProjects(), unpacks, getLog(),
+				this.includeVersionInLibFilename);
 	}
 
 	private ArtifactsFilter[] getAdditionalFilters() {
